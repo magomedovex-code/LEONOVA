@@ -1284,13 +1284,22 @@
   }
 
   // ---------------------------------------------------------------- events
+  // In-page confirmation (native confirm() is blocked in some embedded viewers)
+  let pendingConfirm = null;
+  function askConfirm(msg, yesLabel, onYes) {
+    pendingConfirm = onYes;
+    openModal('<h3>' + esc(msg) + '</h3><div class="actions">' +
+      '<button class="pill ghost" data-act="close-modal">Abbrechen</button>' +
+      '<button class="pill primary" data-act="confirm-yes">' + esc(yesLabel) + '</button></div>');
+  }
+
   function quit() {
+    const leave = () => { stopTimer(); S = null; renderHome(); };
     if (S && S.results.length && S.mode !== 'text') {
-      if (!window.confirm('Runde wirklich beenden? Der Fortschritt dieser Runde geht verloren (XP bleiben).')) return;
+      askConfirm('Runde wirklich beenden? Der Fortschritt dieser Runde geht verloren (XP bleiben).', 'Beenden', leave);
+      return;
     }
-    stopTimer();
-    S = null;
-    renderHome();
+    leave();
   }
 
   app.addEventListener('input', e => {
@@ -1327,13 +1336,20 @@
       case 'time': startTime(); break;
       case 'badges': renderBadges(); break;
       case 'reset':
-        if (window.confirm('Wirklich den ganzen Fortschritt (XP, Fehler, Abzeichen, Entwürfe) löschen?')) {
+        askConfirm('Wirklich den ganzen Fortschritt (XP, Fehler, Abzeichen, Entwürfe) löschen?', 'Löschen', () => {
           Object.assign(P, defaults());
           save();
           renderHome();
           toast('Fortschritt gelöscht.');
-        }
+        });
         break;
+      case 'confirm-yes': {
+        const fn = pendingConfirm;
+        pendingConfirm = null;
+        closeModal();
+        if (fn) fn();
+        break;
+      }
     }
   });
 
