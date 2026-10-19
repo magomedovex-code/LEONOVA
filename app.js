@@ -20,8 +20,8 @@
   WORLDS.forEach(w => { WORLD[w.id] = w; });
   WORLD.texts = { id: 'texts', name: 'Language in Use', icon: '¶' };
 
-  const LEVELS = [0, 100, 250, 500, 900];
   const ROUND_SIZE = 10;
+  const EXAM_COUNT = 5;
   const EXAM_PER_WORLD = { 'adj-adv': 8, past: 8, linking: 7, vocab: 7 };
   const TIME_LIMIT = 60;
 
@@ -37,7 +37,7 @@
   function defaults() {
     return {
       xp: {}, bestStreak: 0, badges: {}, mistakes: {}, stars: {}, rounds: 0,
-      correct: {}, drafts: {}, timeBest: 0, examBest: null, fixed: 0, textsDone: {}
+      correct: {}, drafts: {}, timeBest: 0, examBest: null, fixed: 0, textsDone: {}, roundStars: {}, examGrades: {}
     };
   }
   function load() {
@@ -64,22 +64,45 @@
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
-  function shuffle(a) {
+  // Seeded random numbers: the same seed gives the same order on every device,
+  // so friends get exactly the same rounds and exams.
+  function seededRandom(seed) {
+    let h = 1779033703 ^ seed.length;
+    for (let i = 0; i < seed.length; i++) { h = Math.imul(h ^ seed.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+    return function () {
+      h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909);
+      let t = (h ^= h >>> 16) >>> 0;
+      t = (t + 0x6D2B79F5) >>> 0;
+      let r = Math.imul(t ^ (t >>> 15), 1 | t);
+      r = (r + Math.imul(r ^ (r >>> 7), 61 | r)) ^ r;
+      return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function shuffle(a, seed) {
+    const rnd = seed ? seededRandom(seed) : Math.random;
     const b = a.slice();
     for (let i = b.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
+      const j = Math.floor(rnd() * (i + 1));
       const t = b[i]; b[i] = b[j]; b[j] = t;
     }
     return b;
   }
   function totalXp() { return Object.keys(P.xp).reduce((s, k) => s + (P.xp[k] || 0), 0); }
-  function levelOf(xp) {
-    let lvl = 1;
-    LEVELS.forEach((t, i) => { if (xp >= t) lvl = i + 1; });
-    const next = LEVELS[lvl] == null ? null : LEVELS[lvl];
-    const prev = LEVELS[lvl - 1];
-    const pct = next == null ? 100 : Math.round((xp - prev) / (next - prev) * 100);
-    return { lvl, next, pct };
+
+  // Fixed rounds per world: one fixed mixed order, cut into rounds of 10 (a short rest joins the last round)
+  const ROUNDS = {};
+  WORLDS.forEach(w => {
+    const list = shuffle(QUESTIONS.filter(q => q.world === w.id), 'leonova-round-' + w.id);
+    const rounds = [];
+    for (let i = 0; i < list.length; i += ROUND_SIZE) rounds.push(list.slice(i, i + ROUND_SIZE));
+    if (rounds.length > 1 && rounds[rounds.length - 1].length < 5) rounds[rounds.length - 2] = rounds[rounds.length - 2].concat(rounds.pop());
+    ROUNDS[w.id] = rounds;
+  });
+  function roundKey(world, i) { return world + '#' + i; }
+  function roundsDone(world) { return ROUNDS[world].filter((r, i) => (P.roundStars[roundKey(world, i)] || 0) > 0).length; }
+  function nextRound(world) {
+    const i = ROUNDS[world].findIndex((r, k) => !P.roundStars[roundKey(world, k)]);
+    return i < 0 ? 0 : i;
   }
   function starsHTML(n, max) {
     let h = '';
@@ -435,10 +458,10 @@
     { id: 'streak25', icon: '25', name: '25 in a row', desc: '25 richtige Antworten hintereinander' },
     { id: 'perfect', icon: '★', name: 'Perfect round', desc: '10/10 beim ersten Versuch' },
     { id: 'nohints', icon: '◎', name: 'No hints', desc: 'Runde ohne Hinweis, mind. 8 richtig' },
-    { id: 'master-adj-adv', icon: 'Aa', name: 'Adverb Ace', desc: 'Level 5 in Adjectives & Adverbs' },
-    { id: 'master-past', icon: '⟲', name: 'Past Tense Master', desc: 'Level 5 in Past Tenses' },
-    { id: 'master-linking', icon: '∞', name: 'Linking Legend', desc: 'Level 5 in Linking Words' },
-    { id: 'master-vocab', icon: 'Wd', name: 'Word Collector', desc: 'Level 5 in Vocabulary' },
+    { id: 'master-adj-adv', icon: 'Aa', name: 'Adverb Ace', desc: 'Alle Runden in Adjectives & Adverbs geschafft' },
+    { id: 'master-past', icon: '⟲', name: 'Past Tense Master', desc: 'Alle Runden in Past Tenses geschafft' },
+    { id: 'master-linking', icon: '∞', name: 'Linking Legend', desc: 'Alle Runden in Linking Words geschafft' },
+    { id: 'master-vocab', icon: 'Wd', name: 'Word Collector', desc: 'Alle Runden in Vocabulary geschafft' },
     { id: 'text-pro', icon: '¶', name: 'Text Pro', desc: 'Einen Lückentext ohne Fehler' },
     { id: 'writer', icon: '✎', name: 'Writer', desc: 'Alle Punkte einer Schreib-Checkliste erfüllt' },
     { id: 'speed', icon: '⏱', name: 'Speedster', desc: '10 richtige im 60-Sekunden-Modus' },
@@ -455,7 +478,7 @@
     setTimeout(() => toast('Neues Abzeichen: ' + b.name), 300);
   }
   function checkXpBadges() {
-    WORLDS.forEach(w => { if (levelOf(P.xp[w.id] || 0).lvl >= 5) award('master-' + w.id); });
+    WORLDS.forEach(w => { if (roundsDone(w.id) === ROUNDS[w.id].length) award('master-' + w.id); });
     if (totalXp() >= 1000) award('xp1000');
     if (P.fixed >= 10) award('fixer');
   }
@@ -505,19 +528,18 @@
       '<div class="hero-stats"><span>' + xp + ' XP</span><span>Beste Serie: ' + (P.bestStreak || 0) + '</span><span>' +
       Object.keys(P.badges).length + '/' + BADGES.length + ' Abzeichen</span></div></section>';
 
-    html += '<div class="section-title"><h2>Welten</h2><span class="muted small">10 Aufgaben pro Runde</span></div><div class="grid">';
+    html += '<div class="section-title"><h2>Welten</h2><span class="muted small">Gleiche Runden für alle</span></div><div class="grid">';
     WORLDS.forEach(w => {
-      const wx = P.xp[w.id] || 0;
-      const L = levelOf(wx);
       const n = QUESTIONS.filter(q => q.world === w.id).length;
+      const total = ROUNDS[w.id].length, done = roundsDone(w.id), nr = nextRound(w.id);
       html += '<article class="bubble-card world-card">' +
         '<div class="world-head"><div class="world-icon">' + esc(w.icon) + '</div><div><h3>' + esc(w.name) + '</h3>' +
         '<span class="muted small">' + n + ' Aufgaben</span></div></div>' +
         '<p>' + esc(w.desc) + '</p>' +
-        '<div class="level-row"><span>Level ' + L.lvl + '/5</span><span class="stars">' + starsHTML(P.stars[w.id] || 0) + '</span></div>' +
-        '<div class="bar"><div style="width:' + L.pct + '%"></div></div>' +
-        '<span class="muted small">' + wx + ' XP' + (L.next != null ? ' · nächstes Level bei ' + L.next : ' · Max-Level!') + '</span>' +
-        '<div class="card-actions"><button class="pill primary" data-act="round" data-world="' + w.id + '">Runde starten</button>' +
+        '<div class="level-row"><span>' + done + ' von ' + total + ' Runden geschafft</span></div>' +
+        '<div class="bar"><div style="width:' + Math.round(done / total * 100) + '%"></div></div>' +
+        '<div class="card-actions"><button class="pill primary" data-act="round" data-world="' + w.id + '" data-round="' + nr + '">Runde ' + (nr + 1) + ' starten</button>' +
+        '<button class="pill ghost" data-act="rounds" data-world="' + w.id + '">Alle Runden</button>' +
         '<button class="pill ghost" data-act="cheat" data-world="' + w.id + '">Spickzettel</button></div>' +
         '</article>';
     });
@@ -528,7 +550,7 @@
       modeCard('texts', '¶', 'Texte · Language in Use', TEXTS.length + ' Texte mit Lücken zum Tippen') +
       modeCard('writing', '✎', 'Schreibaufgaben', 'E-Mails & Talk about a friend – mit Checkliste') +
       modeCard('mistakes', '↺', 'Meine Fehler', mc ? plural(mc, 'Aufgabe', 'Aufgaben') + ' zum Wiederholen' : 'Noch keine Fehler gespeichert') +
-      modeCard('exam', 'A', 'Probe-Schularbeit', '30 Aufgaben + 1 Text · Note am Ende' + (P.examBest ? ' · Bestnote ' + P.examBest : '')) +
+      modeCard('exams', 'A', 'Probe-Schularbeit', EXAM_COUNT + ' feste Probe-Schularbeiten · 30 Aufgaben + 1 Text' + (P.examBest ? ' · Bestnote ' + P.examBest : '')) +
       modeCard('time', '⏱', 'Zeitmodus 60 s', 'So viele wie möglich' + (P.timeBest ? ' · Rekord ' + P.timeBest : '')) +
       modeCard('badges', '★', 'Abzeichen', Object.keys(P.badges).length + ' von ' + BADGES.length + ' gesammelt') +
       '</div>';
@@ -551,10 +573,11 @@
     }, opts);
   }
 
-  function startRound(world) {
-    const pool = QUESTIONS.filter(q => q.world === world);
-    if (!pool.length) { toast('Keine Aufgaben gefunden.'); return; }
-    S = newSession('round', { world, hearts: 3, queue: shuffle(pool).slice(0, ROUND_SIZE).map(q => ({ q })) });
+  function startRound(world, idx) {
+    const rounds = ROUNDS[world];
+    if (!rounds || !rounds.length) { toast('Keine Aufgaben gefunden.'); return; }
+    idx = Math.min(Math.max(0, Number(idx) || 0), rounds.length - 1);
+    S = newSession('round', { world, round: idx, hearts: 3, queue: rounds[idx].map(q => ({ q })) });
     S.mainCount = S.queue.length;
     renderPlay();
   }
@@ -568,7 +591,7 @@
   }
   function startTime() {
     const pool = QUESTIONS.filter(q => q.type !== 'sentence');
-    S = newSession('time', { queue: shuffle(pool).map(q => ({ q })), end: Date.now() + TIME_LIMIT * 1000, correctCount: 0 });
+    S = newSession('time', { queue: shuffle(pool, 'leonova-time').map(q => ({ q })), end: Date.now() + TIME_LIMIT * 1000, correctCount: 0 });
     S.mainCount = S.queue.length;
     stopTimer();
     timerId = setInterval(tickTimer, 200);
@@ -581,15 +604,24 @@
     if (el) { el.textContent = left + ' s'; el.classList.toggle('low', left <= 10); }
     if (left <= 0) { stopTimer(); endSession(); }
   }
-  function startExam() {
+  // Fixed mock exams: exam k always has the same tasks, and no task appears in two exams
+  function examQueue(k) {
     let items = [];
+    const verbs = shuffle(QUESTIONS.filter(q => q.type === 'verb3'), 'leonova-exam-verbs');
     WORLDS.forEach(w => {
-      const pool = QUESTIONS.filter(q => q.world === w.id);
-      items = items.concat(shuffle(pool).slice(0, EXAM_PER_WORLD[w.id]));
+      const pool = shuffle(QUESTIONS.filter(q => q.world === w.id && q.type !== 'verb3'), 'leonova-exam-' + w.id);
+      let n = EXAM_PER_WORLD[w.id];
+      if (w.id === 'past') { items = items.concat(verbs.slice(k * 2, k * 2 + 2)); n -= 2; }
+      items = items.concat(pool.slice(k * n, k * n + n));
     });
-    const queue = shuffle(items).map(q => ({ q }));
-    if (TEXTS.length) queue.push({ text: TEXTS[Math.floor(Math.random() * TEXTS.length)] });
-    S = newSession('exam', { queue });
+    const queue = shuffle(items, 'leonova-exam-order-' + k).map(q => ({ q }));
+    if (TEXTS.length) queue.push({ text: TEXTS[k % TEXTS.length] });
+    return queue;
+  }
+  function startExam(k) {
+    k = Math.min(Math.max(0, Number(k) || 0), EXAM_COUNT - 1);
+    S = newSession('exam', { queue: examQueue(k), exam: k });
+    const queue = S.queue;
     S.mainCount = queue.length;
     renderPlay();
   }
@@ -1031,7 +1063,9 @@
       const n = first.length || 1;
       const pct = firstOk / n;
       stars = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.5 ? 1 : 0;
-      P.stars[s.world] = Math.max(P.stars[s.world] || 0, stars);
+      const rk = roundKey(s.world, s.round);
+      P.roundStars[rk] = Math.max(P.roundStars[rk] || 0, stars);
+      checkXpBadges();
       P.rounds = (P.rounds || 0) + 1;
       award('first');
       if (firstOk === s.mainCount && s.mainCount >= 10) award('perfect');
@@ -1065,7 +1099,10 @@
     html += '<div class="actions" style="justify-content:center">' +
       '<button class="pill ghost" data-act="home">Startseite</button>' +
       (wrongs.length ? '<button class="pill ghost" data-act="practice-these">Fehler üben (' + wrongs.length + ')</button>' : '') +
-      '<button class="pill primary" data-act="again" data-enter>Nochmal</button></div></section>';
+      (s.mode === 'round' && s.round < ROUNDS[s.world].length - 1
+        ? '<button class="pill ghost" data-act="again">Nochmal</button><button class="pill primary" data-act="round" data-world="' + s.world + '" data-round="' + (s.round + 1) + '" data-enter>Runde ' + (s.round + 2) + ' →</button>'
+        : '<button class="pill primary" data-act="again" data-enter>Nochmal</button>') +
+      '</div></section>';
 
     if (wrongs.length) {
       html += '<div class="section-title"><h2>Deine Fehler</h2><span class="muted small">mit Erklärung</span></div>';
@@ -1073,10 +1110,13 @@
     } else if (first.length) {
       html += '<p class="muted" style="text-align:center;margin-top:20px">Keine Fehler – stark!</p>';
     }
-    lastSession = { mode: s.mode, world: s.world, wrongIds: wrongs.map(x => x.q.id) };
+    lastSession = { mode: s.mode, world: s.world, round: s.round, wrongIds: wrongs.map(x => x.q.id) };
     S = null;
     show(html);
-    onEnter = () => again();
+    onEnter = () => {
+      if (lastSession.mode === 'round' && lastSession.round < ROUNDS[lastSession.world].length - 1) startRound(lastSession.world, lastSession.round + 1);
+      else again();
+    };
   }
   let lastSession = null;
 
@@ -1089,10 +1129,10 @@
   function again() {
     if (!lastSession) { renderHome(); return; }
     const m = lastSession.mode;
-    if (m === 'round') startRound(lastSession.world);
+    if (m === 'round') startRound(lastSession.world, lastSession.round);
     else if (m === 'mistakes') startMistakes();
     else if (m === 'time') startTime();
-    else if (m === 'exam') startExam();
+    else if (m === 'exam') startExam(lastSession.exam);
     else renderHome();
   }
 
@@ -1132,19 +1172,21 @@
     const pct = max ? Math.round(points / max * 100) : 0;
     const [note, word] = gradeLabel(pct);
     if (P.examBest == null || note < P.examBest) P.examBest = note;
+    const ek = String(s.exam || 0);
+    if (P.examGrades[ek] == null || note < P.examGrades[ek]) P.examGrades[ek] = note;
     if (note <= 2) award('exam');
     addXp('texts', Math.round(points * 5));
     checkXpBadges();
     save();
 
     let html = '<section class="bubble-card end-hero"><div class="q-kind">Probe-Schularbeit</div>' +
-      '<div class="grade">' + note + '</div><h1>' + esc(word) + '</h1>' +
+      '<div class="muted">Probe-Schularbeit ' + ((s.exam || 0) + 1) + '</div><div class="grade">' + note + '</div><h1>' + esc(word) + '</h1>' +
       '<div class="stat-row"><div class="stat"><b>' + (Math.round(points * 10) / 10) + '/' + max + '</b><span>Punkte</span></div>' +
       '<div class="stat"><b>' + pct + ' %</b><span>Prozent</span></div></div>' +
       '<p class="muted small">Notenschlüssel: ab 90 % = 1 · ab 80 % = 2 · ab 65 % = 3 · ab 50 % = 4 · darunter 5</p>' +
       '<div class="actions" style="justify-content:center"><button class="pill ghost" data-act="home">Startseite</button>' +
       '<button class="pill ghost" data-act="mistakes">Fehler üben</button>' +
-      '<button class="pill primary" data-act="again" data-enter>Neue Probe-Schularbeit</button></div></section>' +
+      '<button class="pill primary" data-act="again" data-enter>Nochmal</button></div></section>' +
       '<div class="section-title"><h2>Auswertung</h2><span class="muted small">jede Aufgabe mit Erklärung</span></div>';
     review.forEach((x, i) => {
       if (x.text) {
@@ -1158,7 +1200,7 @@
         html += reviewItem(x.q, x.r).replace('<div class="q-kind">', '<div class="q-kind">' + (i + 1) + ' · ');
       }
     });
-    lastSession = { mode: 'exam' };
+    lastSession = { mode: 'exam', exam: s.exam || 0 };
     S = null;
     show(html);
     onEnter = () => again();
@@ -1195,6 +1237,31 @@
     const f = filter.toLowerCase().trim();
     return VOCAB.filter(v => !f || v.en.toLowerCase().indexOf(f) >= 0 || v.de.toLowerCase().indexOf(f) >= 0)
       .map(v => '<tr><td><b>' + esc(v.en) + '</b>' + (v.def ? '<br><span class="small muted">' + esc(v.def) + '</span>' : '') + '</td><td>' + esc(v.de) + '</td></tr>').join('');
+  }
+
+  // ---------------------------------------------------------------- round & exam pickers
+  function renderRounds(world) {
+    S = null; onEnter = null;
+    const w = WORLD[world];
+    let html = '<div class="section-title"><h2>' + esc(w.name) + '</h2><button class="pill small ghost" data-act="home">← Start</button></div>' +
+      '<p class="muted">Alle Runden sind für jeden gleich – vergleich deine Sterne mit deinen Freunden!</p><div class="grid-3">';
+    ROUNDS[world].forEach((r, i) => {
+      const st = P.roundStars[roundKey(world, i)] || 0;
+      html += '<button class="bubble-card mode-card" data-act="round" data-world="' + world + '" data-round="' + i + '"><strong>Runde ' + (i + 1) +
+        '</strong><span class="stars">' + starsHTML(st) + '</span><span>' + r.length + ' Aufgaben</span></button>';
+    });
+    show(html + '</div>');
+  }
+  function renderExams() {
+    S = null; onEnter = null;
+    let html = '<div class="section-title"><h2>Probe-Schularbeiten</h2><button class="pill small ghost" data-act="home">← Start</button></div>' +
+      '<p class="muted">30 Aufgaben aus allen Welten + 1 Text. Feedback und Note gibt es erst am Ende. Jede Probe-Schularbeit ist für alle gleich.</p><div class="grid-3">';
+    for (let k = 0; k < EXAM_COUNT; k++) {
+      const g = P.examGrades[String(k)];
+      html += '<button class="bubble-card mode-card" data-act="exam" data-exam="' + k + '"><strong>Probe-Schularbeit ' + (k + 1) +
+        '</strong><span>Text: ' + esc(TEXTS[k % TEXTS.length].title) + '</span><span>' + (g != null ? 'Beste Note: ' + g : 'Noch nicht geschrieben') + '</span></button>';
+    }
+    show(html + '</div>');
   }
 
   // ---------------------------------------------------------------- badges screen
@@ -1315,7 +1382,9 @@
     switch (act) {
       case 'home': if (S && S.results && S.results.length && S.mode !== 'text') { quit(); } else renderHome(); break;
       case 'theme': toggleTheme(); break;
-      case 'round': startRound(el.dataset.world); break;
+      case 'round': startRound(el.dataset.world, el.dataset.round); break;
+      case 'rounds': renderRounds(el.dataset.world); break;
+      case 'exams': renderExams(); break;
       case 'cheat': closeModal(); S = null; renderCheat(el.dataset.world); break;
       case 'rule': openRule(el.dataset.rule); break;
       case 'close-modal': closeModal(); break;
@@ -1332,7 +1401,7 @@
       case 'mistakes': startMistakes(); break;
       case 'practice-these': startMistakes(lastSession && lastSession.wrongIds); break;
       case 'again': again(); break;
-      case 'exam': startExam(); break;
+      case 'exam': startExam(el.dataset.exam); break;
       case 'time': startTime(); break;
       case 'badges': renderBadges(); break;
       case 'reset':
