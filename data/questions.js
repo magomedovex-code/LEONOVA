@@ -1275,5 +1275,103 @@
     }]);
   });
 
+  /* ---------- SUPER HARD: more task types ---------- */
+  // X(...) builds every combination of the given parts (for sentences with many correct versions)
+  function X() {
+    var out = [''];
+    Array.prototype.forEach.call(arguments, function (part) {
+      var opts = Array.isArray(part) ? part : [part], next = [];
+      out.forEach(function (o) { opts.forEach(function (p) { next.push((o + ' ' + p).trim()); }); });
+      out = next;
+    });
+    return out;
+  }
+  var TR = 'Übersetze ins Englische. Schreib den ganzen Satz.';
+  var KW = 'Ergänze den zweiten Satz (2–5 Wörter), sodass er dasselbe bedeutet. Benutze das Wort in GROSSBUCHSTABEN.';
+  var ONE = 'Ein Wort ist falsch. Tippe NUR das richtige Wort.';
+  var OPEN = 'Ein Wort fehlt – ohne Hinweis! Tippe das fehlende Wort.';
+  var WF2 = 'Wortbildung mit Vorsilbe/Nachsilbe: Bilde das passende Wort.';
+
+  add('hard', 'past-perfect', [
+    { t: 'sentence', i: TR, p: 'Als ich nach Hause kam, hatte meine Schwester schon abgewaschen.', a: X('When', ['I came home', 'I got home', 'I arrived home'], 'my sister had already', ['done the washing-up', 'done the washing up', 'washed up', 'done the dishes', 'washed the dishes']), y: "Earlier action → had already + V3; do the washing-up." },
+    { t: 'sentence', i: TR, r: 'when-while', p: 'Während ich meine Hausübung machte, rief meine Oma an.', a: X('While I was doing my homework', ['my grandma', 'my granny', 'my grandmother'], ['called', 'phoned', 'rang']).concat(X(['My grandma', 'My granny', 'My grandmother'], ['called', 'phoned', 'rang'], 'while I was doing my homework')), y: "while + past continuous (long action), past simple for the short action. Hausübung = homework (do homework!)." },
+    { t: 'sentence', i: TR, r: 'contrast', p: 'Obwohl wir oft streiten, verstehen wir uns gut.', a: X(['Although', 'Even though', 'Though'], ['we often argue', 'we argue a lot', 'we often fight', 'we fight a lot', 'we argue often'], ['we get on well', 'we get along well', 'we get on well with each other', 'we get along well with each other']), y: "although + clause; sich gut verstehen = get on well / get along well." },
+    { t: 'sentence', i: TR, r: 'contrast', p: 'Trotz des schlechten Wetters gingen wir spazieren.', a: X(['Despite', 'In spite of'], 'the bad weather', ['we went for a walk', 'we went walking']).concat(X(['We went for a walk', 'We went walking'], ['despite', 'in spite of'], 'the bad weather')), y: "despite / in spite of + noun (NOT despite of)." },
+    { t: 'sentence', i: TR, r: 'phrasal-verbs', p: 'Ich habe sie gestern zufällig im Bus getroffen.', a: X('I', ['bumped into', 'ran into'], 'her on the bus yesterday').concat(X('Yesterday I', ['bumped into', 'ran into'], 'her on the bus')), y: "zufällig treffen = bump into; yesterday → past simple (bumped); on the bus." },
+    { t: 'sentence', i: TR + " (Benutze 'used to'.)", r: 'used-to', p: 'Früher hatte ich lange Haare.', a: ['I used to have long hair.'], y: "used to + V1 for a past state." },
+    { t: 'sentence', i: TR, r: 'comparison', p: 'Sie spricht viel besser Englisch als ich.', a: X('She speaks English', ['much', 'far', 'a lot'], ['better than me', 'better than I do']).concat(X('She speaks', ['much', 'far', 'a lot'], ['better English than me', 'better English than I do'])), y: "much/far + better (good – better – best) + than." },
+    { t: 'sentence', i: TR, r: 'for-since', p: 'Wir kennen uns seit fünf Jahren.', a: ['We have known each other for five years.', 'We have known one another for five years.'], y: "German 'seit' + period → present perfect + FOR." },
+    { t: 'sentence', i: TR, r: 'tricky-adverbs', p: 'Er war so müde, dass er kaum die Augen offen halten konnte.', a: X(['He was so tired that he could', 'He was so tired he could'], ['hardly', 'barely'], 'keep his eyes open'), y: "kaum = hardly (NOT hard)." },
+    { t: 'sentence', i: TR + " (Benutze 'unless'.)", r: 'condition', p: 'Wenn du nicht lernst, wirst du die Schularbeit nicht schaffen.', a: X(['Unless you study', 'Unless you learn'], "you won't pass", ['the test', 'the exam']).concat(X("You won't pass", ['the test', 'the exam'], ['unless you study', 'unless you learn'])), y: "unless = if … not → Unless you study (positive verb!)." },
+    { t: 'sentence', i: TR, r: 'vocab-family', p: 'Meine Eltern ließen sich scheiden, als ich sechs war.', a: X(['My parents got divorced', 'My parents divorced', 'My parents got a divorce'], ['when I was six', 'when I was six years old']), y: "sich scheiden lassen = get divorced." },
+    { t: 'sentence', i: TR, r: 'verb-prep', p: 'Ich freue mich darauf, dich zu sehen.', a: ["I'm looking forward to seeing you.", 'I look forward to seeing you.'], y: "look forward TO + -ing." }
+  ]);
+
+  add('hard', 'past-perfect-cont', [
+    { i: KW, p: 'She started learning the piano five years ago. (BEEN) → She ____ the piano for five years.', a: ['has been learning', "'s been learning"], y: "Started in the past and still going on → has been + V-ing + for." },
+    { i: KW, r: 'for-since', p: 'I last saw Tom in 2020. (SEEN) → I ____ Tom since 2020.', a: ["haven't seen", 'have not seen'], y: "last saw … in → haven't seen … since." },
+    { i: KW, r: 'contrast', p: 'It was raining, but we went out. (DESPITE) → We went out ____.', a: ['despite the rain', 'despite the fact that it was raining', 'despite it raining', 'despite the rainy weather'], y: "despite + noun (the rain)." },
+    { i: KW, r: 'past-perfect', p: 'The film started before we arrived. (ALREADY) → When we arrived, the film ____.', a: ['had already started', 'had started already', 'had already begun'], y: "had + already + V3." },
+    { i: KW, r: 'used-to', p: "I don't eat meat now, but I did in the past. (USED) → I ____ meat.", a: ['used to eat'], y: "used to + V1 = früher (jetzt nicht mehr)." },
+    { i: KW, r: 'intensifiers', p: "He is too short to reach the shelf. (ENOUGH) → He isn't ____ the shelf.", a: ['tall enough to reach'], y: "too short = not tall enough (adjective + enough + to V1)." },
+    { i: KW, r: 'adj-vs-adv', p: 'Lisa sings beautifully. (SINGER) → Lisa is ____.', a: ['a beautiful singer'], y: "adverb → adjective before a noun: a beautiful singer." },
+    { i: KW, r: 'adj-vs-adv', p: 'My brother is a careful driver. (CAREFULLY) → My brother ____.', a: ['drives carefully'], y: "adjective + noun → verb + adverb." },
+    { i: KW, r: 'comparison', p: 'No one in my class is taller than Ben. (TALLEST) → Ben is ____ in my class.', a: ['the tallest', 'the tallest boy', 'the tallest person', 'the tallest pupil', 'the tallest student'], y: "the + superlative." },
+    { i: KW, r: 'condition', p: "If you don't hurry, you'll miss the bus. (UNLESS) → You'll miss the bus ____.", a: ['unless you hurry', 'unless you hurry up'], y: "unless + positive verb." },
+    { i: KW, r: 'vocab-friendship', p: 'We became friends immediately. (HIT) → We ____ immediately.', a: ['hit it off'], y: "hit it off = sich auf Anhieb verstehen." },
+    { i: KW, r: 'phrasal-verbs', p: 'She never disappoints her friends. (LETS) → She never ____.', a: ['lets her friends down', 'lets them down'], y: "let sb down = enttäuschen / im Stich lassen." },
+    { i: KW, r: 'phrasal-verbs', p: 'They had an argument and stopped being friends. (FELL) → They ____.', a: ['fell out', 'fell out with each other', 'fell out with one another'], y: "fall out (with) → fell out." },
+    { i: KW, r: 'vocab-friendship', p: 'Tom and I like the same things. (COMMON) → Tom and I ____.', a: ['have a lot in common', 'have lots in common', 'have much in common', 'have many things in common', 'have so much in common'], y: "have a lot in common." },
+    { i: KW, r: 'phrasal-verbs', p: 'I met my old teacher by chance in town. (BUMPED) → I ____ in town.', a: ['bumped into my old teacher'], y: "bump into = meet by chance." },
+    { i: KW, r: 'vocab-family', p: 'She started school when she was six. (AGE) → She started school ____ six.', a: ['at the age of'], y: "at the age of + number." }
+  ]);
+
+  add('hard', 'adverb-position', [
+    { i: ONE, r: 'tricky-adverbs', p: 'I have hardly never seen him so angry.', a: ['ever'], y: "hardly ever (= fast nie) – 'hardly never' is a double negative." , x: { never: "'hardly' is already negative → hardly EVER." } },
+    { i: ONE, r: 'for-since', p: 'She has lived here since three years.', a: ['for'], y: "Period → for.", x: { since: "That's the wrong word: since + point in time." } },
+    { i: ONE, r: 'verb-prep', p: 'We were looking forward to meet you.', a: ['meeting'], y: "look forward to + -ing.", x: {} },
+    { i: ONE, r: 'word-formation', p: 'The children were very exciting about the trip.', a: ['excited'], y: "People feel → excited.", x: {} },
+    { i: ONE, r: 'past-simple-neg', p: "He didn't went to school yesterday.", a: ['go'], y: "didn't + V1.", x: { went: "That's the wrong word: after didn't → V1." } },
+    { i: ONE, r: 'pairs', p: 'Neither Anna or Tom came to the party.', a: ['nor'], y: "neither … nor.", x: {} },
+    { i: ONE, r: 'adj-prep', p: 'She is very good in maths.', a: ['at'], y: "good AT.", x: {} },
+    { i: ONE, r: 'past-perfect', p: 'By the time I arrived, everybody has left.', a: ['had'], y: "By the time + past → past perfect: had left.", x: {} },
+    { i: ONE, r: 'comparison', p: 'It was the funnier film I have ever seen.', a: ['funniest'], y: "the … I have ever seen → superlative.", x: {} },
+    { i: ONE, r: 'irregular-adverbs', p: 'My stepsister and I get on very good.', a: ['well'], y: "get on WELL (adverb).", x: {} },
+    { i: ONE, r: 'intensifiers', p: "I'm not tall enough for reach the top shelf.", a: ['to'], y: "adjective + enough + TO + V1.", x: {} },
+    { i: ONE, r: 'collocations-make-do', p: 'He made his homework in the kitchen.', a: ['did'], y: "DO homework → did.", x: {} },
+    { i: ONE, r: 'for-since', p: 'While the film, I fell asleep.', a: ['during'], y: "during + noun.", x: {} },
+    { i: ONE, r: 'linking-verbs', p: 'The milk smells badly.', a: ['bad'], y: "smell (linking verb) + adjective.", x: {} }
+  ]);
+
+  add('hard', 'verb-prep', [
+    { i: OPEN, r: 'for-since', p: 'We have known each other ____ we were five.', a: ['since'], y: "since + starting point.", x: { for: "A starting point (we were five) → since." } },
+    { i: OPEN, p: "I'm not used ____ getting up so early.", a: ['to'], y: "be used TO + -ing (= gewohnt sein).", x: {} },
+    { i: OPEN, r: 'intensifiers', p: 'She was ____ tired that she fell asleep on the sofa.', a: ['so'], y: "so + adjective + that.", x: { such: "such + (a) + noun. With an adjective alone → so." } },
+    { i: OPEN, r: 'intensifiers', p: 'It was ____ a nice day that we went to the lake.', a: ['such'], y: "such + a + adjective + noun + that.", x: { so: "so + adjective; such + a + noun." } },
+    { i: OPEN, r: 'pairs', p: '____ of my parents speaks English – they only speak German.', a: ['neither'], y: "Neither of … (+ singular verb) = keiner von beiden.", x: { none: "With two people → neither.", both: "'speaks' and the meaning (they DON'T) → neither." } },
+    { i: OPEN, r: 'by-until', p: "I'll wait here ____ you come back.", a: ['until', 'till'], y: "until + clause (continuing action).", x: { by: "'by' is a deadline. Waiting continues → until." } },
+    { i: OPEN, p: 'He apologised ____ forgetting my birthday.', a: ['for'], y: "apologise FOR + -ing.", x: {} },
+    { i: OPEN, r: 'comparison', p: 'The more you practise, the ____ you get.', a: ['better'], y: "the + comparative …, the + comparative.", x: {} },
+    { i: OPEN, r: 'for-since', p: "I hadn't seen her ____ ages, so we met up to catch up.", a: ['for'], y: "for ages.", x: { since: "A period → for." } },
+    { i: OPEN, r: 'tricky-adverbs', p: 'Hardly ____ came to the meeting – only three people.', a: ['anyone', 'anybody'], y: "hardly anyone = kaum jemand.", x: { nobody: "'hardly' is already negative → hardly ANYONE." } },
+    { i: OPEN, p: 'Who does this phone belong ____?', a: ['to'], y: "belong TO.", x: {} },
+    { i: OPEN, r: 'contrast', p: 'She looks like her dad, ____ she behaves just like her mum.', a: ['but', 'although', 'though', 'whereas', 'while', 'yet'], y: "Contrast between two clauses.", x: { despite: "'despite' + noun. A clause follows → but / although." } }
+  ]);
+
+  add('hard', 'word-formation', [
+    { i: WF2, p: 'The workshop was ____ (expect) expensive.', a: ['unexpectedly'], y: "un + expected + ly → describes the adjective 'expensive'.", x: { unexpected: "Before an adjective → adverb: unexpectedly." } },
+    { i: WF2, p: 'He ____ (fortune) missed the last bus.', a: ['unfortunately'], y: "un + fortunate + ly = leider.", x: { fortunately: "Missing the bus is bad → UNfortunately." } },
+    { i: WF2, p: 'Her ____ (friend) behaviour surprised everyone – she is usually so kind.', a: ['unfriendly'], y: "un + friendly (adjective before 'behaviour').", x: { friendly: "She is usually kind, so this behaviour was NOT friendly → unfriendly." } },
+    { i: WF2, p: 'She answered the question ____ (correct), so she lost a point.', a: ['incorrectly', 'wrongly'], y: "in + correct + ly (she lost a point).", x: { correctly: "She lost a point → INcorrectly." } },
+    { i: WF2, p: "It's ____ (believe) how much he has changed.", a: ['unbelievable', 'incredible'], y: "un + believe + able.", x: {} },
+    { i: WF2, p: 'The ____ (lonely) of being an only child can be hard.', a: ['loneliness'], y: "After 'The' → noun: lonely → loneliness (y → i).", x: { lonelyness: "y → i: loneliness." } },
+    { i: WF2, p: 'He treated his stepbrother very ____ (fair).', a: ['unfairly'], y: "un + fair + ly (how did he treat him?).", x: { fairly: "'very fairly' is possible, but this sentence is about bad treatment → unfairly." } },
+    { i: WF2, p: "Bullying can be ____ (harm) to a child's well-being.", a: ['harmful'], y: "harm + ful (adjective after 'be').", x: { harmless: "harmless = harmlos – the opposite!" } },
+    { i: WF2, p: 'We were ____ (pleasant) surprised by the result.', a: ['pleasantly'], y: "Adverb before the adjective 'surprised'.", x: { pleasant: "Before an adjective → adverb." } },
+    { i: WF2, p: 'She is completely ____ (depend) of her parents – she has her own job and flat.', a: ['independent'], y: "in + depend + ent (+ OF).", x: { dependent: "She has her own job → she does NOT depend on them → independent." } },
+    { i: WF2, p: 'It was an ____ (forget) day – the best of my life!', a: ['unforgettable'], y: "un + forget + t + able (double t!).", x: { unforgetable: "Spelling: unforgettable (double t)." } },
+    { i: WF2, p: 'His ____ (patient) annoyed the teacher.', a: ['impatience'], y: "After 'His' → noun; annoyed → negative: im + patience.", x: { patience: "It annoyed the teacher → IMpatience." } }
+  ]);
+
   /* Make/do prompts and other checks happen in app.js. */
 })();

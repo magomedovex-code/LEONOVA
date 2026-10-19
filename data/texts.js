@@ -229,3 +229,109 @@ window.WRITING = [
     model: "I would like to tell you about my best friend, Sophie. We met at the age of ten on our first day at secondary school, and we hit it off immediately. We were sitting next to each other in maths, and we couldn't stop laughing at the same jokes. A few weeks later we went on a school trip together and got to know each other better.\n\nWe have a lot in common: we both love horses, we hate getting up early and we are crazy about the same music. Of course, we are also different. Sophie is very calm, while I can be quite impatient. Still, we get on really well and I always enjoy her company.\n\nLast year we fell out because I had told one of her secrets to another girl in our clique. Sophie was really hurt, and we didn't talk for a week. Then I bumped into her at the bus stop and apologised. We talked for hours and finally made up. Since then, our bond has been even stronger.\n\nSophie is important to me because I can always rely on her. She treats me with respect, she never judges me and she would never let me down. Even when she moved to another town, we kept in touch and met up every month to catch up. I really believe this will be a lifelong friendship."
   }
 ];
+
+/* Super Hard texts: tenses, word formation (often 2 steps) and gaps WITHOUT any hint mixed together. */
+window.HARD_TEXTS = [
+  {
+    id: 'htx-01', hard: true, title: 'The Reunion', topic: 'Friendship',
+    instr: 'SUPER HARD: Wort in Klammern umformen – Lücken ohne Klammer brauchen ein fehlendes Wort (kein Hinweis!).',
+    body: "Last summer I ___ (not / see) my best friend Jana for almost three years. She ___ (move) to Canada with her family when we were twelve, and at first we kept ___ touch every day. But ___ time, our messages became shorter and shorter.\n\nThen, ___ (expect), she wrote that she was coming back to Vienna for two weeks. When I finally saw her at the airport, I was ___ (incredible) nervous. What if we had nothing in ___ any more? ___ my worries, we hit it off immediately, just like before. We ___ (talk) for hours when we realised that we ___ (miss) the last bus home!",
+    gaps: [
+      { a: ["hadn't seen", 'had not seen'], rule: 'past-perfect', why: "Up to a moment in the past (last summer) + for … → past perfect: hadn't seen.", wrong: { "didn't see": "Up to that moment in the past → hadn't seen.", "haven't seen": "The story is in the past → had, not have." } },
+      { a: ['had moved'], rule: 'past-perfect', why: "Earlier than 'last summer' → had moved.", wrong: { moved: "It happened before the main story → had moved." } },
+      { a: ['in'], rule: 'vocab-meeting', why: "keep IN touch." },
+      { a: ['over', 'with'], rule: 'sequence-addition', why: "over time / with time = mit der Zeit." },
+      { a: ['unexpectedly'], rule: 'word-formation', why: "un + expected + ly: sentence adverb.", wrong: { unexpected: "Sentence adverb → unexpectedly.", expectedly: "It was a surprise → UNexpectedly." } },
+      { a: ['incredibly'], rule: 'adj-vs-adv', why: "Adverb before the adjective 'nervous'.", wrong: { incredible: "Before an adjective → adverb." } },
+      { a: ['common'], rule: 'vocab-friendship', why: "have (nothing) in common." },
+      { a: ['despite', 'in spite of'], rule: 'contrast', why: "despite + noun (my worries).", wrong: { although: "'although' needs subject + verb. Noun → despite." } },
+      { a: ['had been talking'], rule: 'past-perfect-cont', why: "for hours + when … → had been + V-ing.", wrong: { 'were talking': "Duration (for hours) before another past action → had been talking." } },
+      { a: ['had missed'], rule: 'past-perfect', why: "They realised it afterwards → the missing happened earlier → had missed.", wrong: { missed: "It happened before 'realised' → had missed." } }
+    ]
+  },
+  {
+    id: 'htx-02', hard: true, title: 'Two New Siblings', topic: 'Family',
+    instr: 'SUPER HARD: Wort in Klammern umformen – Lücken ohne Klammer brauchen ein fehlendes Wort (kein Hinweis!).',
+    body: "When my mum ___ (marry) Peter, I suddenly had two ___ (Stiefgeschwister) – Peter's kids, Max and Lea. At first, there was a lot of ___ (tense) in our new household. Lea and I ___ (constant) argued about the bathroom, and Max ___ (hard) ever spoke to me.\n\nOne evening, ___ we were doing the washing-up, Lea told me that she ___ (feel) lonely for months because she missed her old friends. Suddenly I understood her much ___ (good). Since that evening, we ___ (get) on really well. Now we even do our fair ___ of the chores without complaining!",
+    gaps: [
+      { a: ['married'], rule: 'past-simple', why: "Past simple: a finished event.", wrong: { 'has married': "A finished event in the past → married." } },
+      { a: ['stepsiblings', 'step-siblings'], rule: 'vocab-family', why: "Stiefgeschwister = stepsiblings (plural: two).", wrong: { stepsibling: "two → plural: stepsiblings.", 'half-siblings': "Half-siblings share a parent. Peter's kids → stepsiblings." } },
+      { a: ['tension'], rule: 'vocab-feelings', why: "a lot of + noun: tense → tension." },
+      { a: ['constantly'], rule: 'adverb-formation', why: "Adverb describing 'argued'." , wrong: { constant: "Describes the verb → constantly." } },
+      { a: ['hardly'], rule: 'tricky-adverbs', why: "hardly ever = fast nie.", wrong: { hard: "kaum → hardly." } },
+      { a: ['while', 'as', 'when'], rule: 'when-while', why: "while + past continuous.", wrong: { during: "'during' + noun. A clause follows → while." } },
+      { a: ['had been feeling', 'had felt'], rule: 'past-perfect-cont', why: "for months before she told me → had been feeling.", wrong: { felt: "for months up to that evening → had been feeling.", 'was feeling': "for months BEFORE → had been feeling." } },
+      { a: ['better'], rule: 'comparison', why: "much + comparative: good → better.", wrong: { gooder: "Irregular: better." } },
+      { a: ['have got', 'have gotten', 'have been getting'], rule: 'for-since', why: "Since that evening (until now) → present perfect: have got on.", wrong: { got: "'Since …' until now → present perfect: have got." } },
+      { a: ['share'], rule: 'vocab-chores', why: "do your fair share." }
+    ]
+  },
+  {
+    id: 'htx-03', hard: true, title: 'The Party', topic: 'School',
+    instr: 'SUPER HARD: Wort in Klammern umformen – Lücken ohne Klammer brauchen ein fehlendes Wort (kein Hinweis!).',
+    body: "Last Saturday I went to a party ___ my parents had told me to be home by ten. Everybody there was older ___ me, and some of them were smoking. A boy ___ (offer) me a cigarette while I ___ (stand) in the kitchen. I didn't want one, but I felt ___ (embarrass) to say no in front of everyone.\n\n___ (luck), my friend Mia came in at that moment. She took my arm and said ___ (calm), 'We're leaving.' On the way home she told me that she ___ (have) the same problem the year before. I ___ (never / be) so grateful to a friend. Real friends never let you ___.",
+    gaps: [
+      { a: ['although', 'though', 'even though'], rule: 'contrast', why: "Contrast + clause → although.", wrong: { despite: "'despite' + noun. A clause follows → although.", because: "No reason here – it's a contrast." } },
+      { a: ['than'], rule: 'comparison', why: "comparative + than.", wrong: { then: "'then' = dann. Comparisons use THAN." } },
+      { a: ['offered'], rule: 'past-simple', why: "Short action → past simple." },
+      { a: ['was standing'], rule: 'when-while', why: "while + past continuous.", wrong: { stood: "while + long action → was standing." } },
+      { a: ['embarrassed', 'too embarrassed'], rule: 'word-formation', why: "-ed = how a person feels.", wrong: { embarrassing: "I FEEL it → embarrassed." } },
+      { a: ['luckily', 'fortunately'], rule: 'word-formation', why: "Sentence adverb: Luckily, …", wrong: { lucky: "Sentence adverb → luckily." } },
+      { a: ['calmly'], rule: 'adj-vs-adv', why: "How did she say it? → adverb.", wrong: { calm: "Describes 'said' → calmly." } },
+      { a: ['had had'], rule: 'past-perfect', why: "the year before → earlier → had + had (V3 of have).", wrong: { had: "Earlier than the story → past perfect: had had." } },
+      { a: ['had never been', 'have never been'], rule: 'past-perfect', why: "never + up to that moment → had never been.", wrong: { 'was never': "never … before that moment → had never been." } },
+      { a: ['down'], rule: 'phrasal-verbs', why: "let sb down." }
+    ]
+  },
+  {
+    id: 'htx-04', hard: true, title: 'Twins, but Different', topic: 'Family',
+    instr: 'SUPER HARD: Wort in Klammern umformen – Lücken ohne Klammer brauchen ein fehlendes Wort (kein Hinweis!).',
+    body: "My twin brother Felix and I look ___ (exact) the same, but our personalities are ___ (complete) different. Felix is the ___ (organise) one: he ___ (always / do) his homework before dinner. I, on the other hand, ___ (hard) ever start before midnight.\n\nWhen we were little, our grandma ___ (use) to say that Felix was the sun and I was the moon. Last year we ___ (fall) out because I had told one of his secrets to his girlfriend. He ___ (not / speak) to me for a week. In the end, I apologised ___ what I had done, and we made ___.",
+    gaps: [
+      { a: ['exactly'], rule: 'adj-vs-adv', why: "Adverb before 'the same'.", wrong: { exact: "Here you need the adverb → exactly." } },
+      { a: ['completely'], rule: 'adj-vs-adv', why: "Adverb before the adjective 'different'.", wrong: { complete: "Before an adjective → adverb." } },
+      { a: ['organised', 'organized'], rule: 'word-formation', why: "Adjective: organised (well-organised person).", wrong: { organising: "Describes a person's character → organised." } },
+      { a: ['always does'], rule: 'adverb-position', why: "Present simple (habit), he → does; always before the main verb.", wrong: { 'does always': "Frequency adverb BEFORE the main verb: always does.", 'always do': "he → does." } },
+      { a: ['hardly'], rule: 'tricky-adverbs', why: "hardly ever = fast nie." },
+      { a: ['used'], rule: 'used-to', why: "used to + V1 (past habit).", wrong: { use: "Positive sentence → used to." } },
+      { a: ['fell'], rule: 'phrasal-verbs', why: "fall out → fell out.", wrong: { felt: "felt = feel. fall → fell." } },
+      { a: ["didn't speak", 'did not speak', "didn't talk", "wouldn't speak", 'would not speak'], rule: 'past-simple-neg', why: "didn't + V1.", wrong: { "didn't spoke": "After didn't → V1." } },
+      { a: ['for'], rule: 'verb-prep', why: "apologise FOR." },
+      { a: ['up'], rule: 'phrasal-verbs', why: "make up = sich versöhnen." }
+    ]
+  },
+  {
+    id: 'htx-05', hard: true, title: 'A Letter of Complaint', topic: 'School',
+    instr: 'SUPER HARD (formeller Brief): Wort in Klammern umformen – Lücken ohne Klammer brauchen ein fehlendes Wort.',
+    body: "Dear Sir or Madam,\n\nI am writing to complain ___ the language course I attended last month. ___ your website had promised small groups, there were twenty-five students in my class. In ___, the teacher often arrived late and left ___ (early) than planned.\n\nI ___ (expect) a professional course, but I was ___ (bitter) disappointed. ___ the high price, the books were not included either. I would be grateful ___ you could refund part of the fee. I look forward to ___ (hear) from you.\n\nYours ___,\nLena Huber",
+    gaps: [
+      { a: ['about'], rule: 'verb-prep', why: "complain ABOUT." },
+      { a: ['although', 'though', 'even though', 'while', 'whereas'], rule: 'contrast', why: "Contrast + clause → although.", wrong: { despite: "A clause follows → although." } },
+      { a: ['addition'], rule: 'sequence-addition', why: "In addition, = außerdem." },
+      { a: ['earlier'], rule: 'adverb-comparison', why: "early → earlier + than.", wrong: { 'more early': "early → earlier." } },
+      { a: ['had expected'], rule: 'past-perfect', why: "Before the course → had expected.", wrong: { expected: "The expectation was before → had expected." } },
+      { a: ['bitterly'], rule: 'adj-vs-adv', why: "bitterly disappointed (adverb before an adjective).", wrong: { bitter: "Before an adjective → adverb." } },
+      { a: ['despite', 'in spite of'], rule: 'contrast', why: "despite + noun (the high price).", wrong: { although: "Noun → despite." } },
+      { a: ['if'], rule: 'condition', why: "I would be grateful IF you could …" },
+      { a: ['hearing'], rule: 'verb-prep', why: "look forward to + -ing.", wrong: { hear: "to is a preposition here → hearing." } },
+      { a: ['faithfully'], rule: 'sequence-addition', why: "Dear Sir or Madam → Yours faithfully.", wrong: { sincerely: "With 'Dear Sir or Madam' → Yours faithfully." } }
+    ]
+  },
+  {
+    id: 'htx-06', hard: true, title: "Grandpa's Farm Life", topic: 'Family',
+    instr: 'SUPER HARD: Wort in Klammern umformen – Lücken ohne Klammer brauchen ein fehlendes Wort (kein Hinweis!).',
+    body: "My grandpa grew up on a farm ___ the 1950s. He ___ (never / see) a television until he was fifteen. He ___ (use) to get up at five every morning to feed the animals. He told me that one winter it ___ (snow) for three days when the roof of the barn suddenly ___ (collapse).\n\n___ (fortune), nobody was inside at that moment. His family was poor, ___ they were always ___ (content). Grandpa says that children today have ___ (many) toys than he had, but they are not ___ (necessary) happier.",
+    gaps: [
+      { a: ['in'], rule: 'prep-time', why: "IN + decades/years." },
+      { a: ['had never seen'], rule: 'past-perfect', why: "never … until (a past moment) → had never seen.", wrong: { 'never saw': "Up to that past moment → had never seen." } },
+      { a: ['used'], rule: 'used-to', why: "used to + V1." },
+      { a: ['had been snowing'], rule: 'past-perfect-cont', why: "for three days before something happened → had been snowing.", wrong: { snowed: "Duration before another past event → had been snowing.", 'was snowing': "With 'for three days' before → had been snowing." } },
+      { a: ['collapsed'], rule: 'past-simple', why: "Short sudden action → past simple." },
+      { a: ['fortunately', 'luckily'], rule: 'word-formation', why: "Sentence adverb: Fortunately, …", wrong: { fortunate: "Sentence adverb → fortunately." } },
+      { a: ['but', 'yet'], rule: 'contrast', why: "Contrast between two clauses → but." },
+      { a: ['contented', 'content'], rule: 'vocab-feelings', why: "be + adjective: contented = zufrieden.", wrong: { contentedly: "After 'were' → adjective." } },
+      { a: ['more'], rule: 'comparison', why: "many – more – most (+ than).", wrong: { manier: "Irregular: more." } },
+      { a: ['necessarily'], rule: 'adverb-formation', why: "Adverb before 'happier': necessary → necessarily.", wrong: { necessary: "Before an adjective → adverb.", necessarly: "Spelling: necessarily." } }
+    ]
+  }
+];

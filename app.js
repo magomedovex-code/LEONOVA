@@ -7,6 +7,8 @@
   const QUESTIONS = Array.isArray(window.QUESTIONS) ? window.QUESTIONS : [];
   const RULES = window.RULES || {};
   const TEXTS = Array.isArray(window.TEXTS) ? window.TEXTS : [];
+  const HARD_TEXTS = Array.isArray(window.HARD_TEXTS) ? window.HARD_TEXTS : [];
+  const ALL_TEXTS = TEXTS.concat(HARD_TEXTS);
   const WRITING = Array.isArray(window.WRITING) ? window.WRITING : [];
   const VOCAB = Array.isArray(window.VOCAB) ? window.VOCAB : [];
 
@@ -98,6 +100,7 @@
     const rounds = [];
     for (let i = 0; i < list.length; i += ROUND_SIZE) rounds.push(list.slice(i, i + ROUND_SIZE));
     if (rounds.length > 1 && rounds[rounds.length - 1].length < 5) rounds[rounds.length - 2] = rounds[rounds.length - 2].concat(rounds.pop());
+    if (w.id === 'hard') HARD_TEXTS.forEach((t, i) => { if (rounds[i]) rounds[i] = rounds[i].concat([t]); });
     ROUNDS[w.id] = rounds;
   });
   function roundKey(world, i) { return world + '#' + i; }
@@ -362,7 +365,7 @@
     const rule = RULES[g.rule];
     return {
       id: t.id + '#' + (i + 1),
-      world: (rule && rule.world) || 'texts',
+      world: t.hard ? 'hard' : ((rule && rule.world) || 'texts'),
       type: 'type',
       prompt: s.slice(start, end).replace('\u0000', '____').trim(),
       answer: g.a,
@@ -380,7 +383,7 @@
     if (q.type === 'verb3') q.answer.forEach(arr => arr.forEach(addKnown));
     else q.answer.forEach(addKnown);
   });
-  TEXTS.forEach(t => t.gaps.forEach((g, i) => {
+  ALL_TEXTS.forEach(t => t.gaps.forEach((g, i) => {
     g.a.forEach(addKnown);
     const q = gapQuestion(t, i);
     QMAP[q.id] = q;
@@ -537,7 +540,8 @@
       '<div class="hard-head"><span class="hard-badge">!!</span><div><h2>Super Hard</h2><p>' + esc(HARD.desc) + '</p></div></div>' +
       '<div class="hard-meta"><span>' + QUESTIONS.filter(q => q.world === 'hard').length + ' Aufgaben</span><span>' + hDone + ' von ' + hTotal + ' Runden geschafft</span></div>' +
       '<div class="card-actions"><button class="pill hard-pill" data-act="round" data-world="hard" data-round="' + hNext + '">Runde ' + (hNext + 1) + ' starten</button>' +
-      '<button class="pill hard-ghost" data-act="rounds" data-world="hard">Alle Runden</button></div></section>';
+      '<button class="pill hard-ghost" data-act="rounds" data-world="hard">Alle Runden</button>' +
+      '<button class="pill hard-ghost" data-act="hard-texts">Super Hard Texte (' + HARD_TEXTS.length + ')</button></div></section>';
     html += '<div class="section-title"><h2>Welten</h2><span class="muted small">Gleiche Runden für alle</span></div><div class="grid">';
     WORLDS.forEach(w => {
       const n = QUESTIONS.filter(q => q.world === w.id).length;
@@ -587,7 +591,7 @@
     const rounds = ROUNDS[world];
     if (!rounds || !rounds.length) { toast('Keine Aufgaben gefunden.'); return; }
     idx = Math.min(Math.max(0, Number(idx) || 0), rounds.length - 1);
-    S = newSession('round', { world, round: idx, hearts: 3, queue: rounds[idx].map(q => ({ q })) });
+    S = newSession('round', { world, round: idx, hearts: 3, queue: rounds[idx].map(x => (x.gaps ? { text: x } : { q: x })) });
     S.mainCount = S.queue.length;
     renderPlay();
   }
@@ -681,7 +685,7 @@
   function renderPlay() {
     const entry = current();
     if (!entry) { endSession(); return; }
-    if (entry.text) { renderTextTask(entry.text, true); return; }
+    if (entry.text) { renderTextTask(entry.text, S.mode === 'exam' ? 'exam' : 'round'); return; }
     const q = entry.q;
     S.checked = false; S.hintUsed = false; S.emptyTries = 0;
     const w = WORLD[q.world] || WORLD.texts;
@@ -919,12 +923,15 @@
   function pickPraise() { return PRAISE[Math.floor(Math.random() * PRAISE.length)]; }
 
   // ---------------------------------------------------------------- texts
-  function renderTextsList() {
+  function renderTextsList(hard) {
     S = null; onEnter = null;
-    let html = '<div class="section-title"><h2>Language in Use</h2><button class="pill small ghost" data-act="home">← Start</button></div>' +
-      '<p class="muted">Kurze Texte über Familie, Freundschaft und Schule. Jede Lücke ist ein Eingabefeld. Nach „Prüfen“ wird jede Lücke grün oder rot – mit Erklärung.</p>' +
-      '<div class="bubble-card">';
-    TEXTS.forEach(t => {
+    let html = hard
+      ? '<div class="section-title"><h2>Super Hard Texte</h2><button class="pill small ghost" data-act="home">← Start</button></div>' +
+        '<p class="muted">Die schwersten Texte: alle Zeitformen, Wortbildung mit Vor- und Nachsilben und Lücken ganz ohne Hinweis.</p><div class="bubble-card hard-list">'
+      : '<div class="section-title"><h2>Language in Use</h2><button class="pill small ghost" data-act="home">← Start</button></div>' +
+        '<p class="muted">Kurze Texte über Familie, Freundschaft und Schule. Jede Lücke ist ein Eingabefeld. Nach „Prüfen“ wird jede Lücke grün oder rot – mit Erklärung.</p>' +
+        '<div class="bubble-card">';
+    (hard ? HARD_TEXTS : TEXTS).forEach(t => {
       const done = P.textsDone[t.id];
       html += '<div class="list-row"><div><h3>' + esc(t.title) + '</h3><p>' + esc(t.topic) + ' · ' + t.gaps.length + ' Lücken' +
         (done != null ? ' · Bestes Ergebnis: ' + done + '/' + t.gaps.length : '') + '</p></div>' +
@@ -935,14 +942,15 @@
   }
 
   function startText(id) {
-    const t = TEXTS.find(x => x.id === id);
+    const t = ALL_TEXTS.find(x => x.id === id);
     if (!t) return;
     S = newSession('text', { queue: [{ text: t }], mainCount: 1 });
-    renderTextTask(t, false);
+    renderTextTask(t, 'solo');
   }
 
-  function renderTextTask(t, inExam) {
-    S.checked = false;
+  function renderTextTask(t, mode) {
+    const inExam = mode === 'exam';
+    S.checked = false; S.emptyTries = 0;
     const parts = textParts(t);
     let body = '';
     parts.forEach((p, i) => {
@@ -953,10 +961,10 @@
           INPUT_ATTRS + ' style="width:' + Math.min(len, 22) + 'ch" aria-label="Lücke ' + (i + 1) + '"></span>';
       }
     });
-    const top = inExam ? topBar() + '<div class="meta-row"><span class="chip">Probe-Schularbeit</span><span class="chip">Text</span></div>'
-      : '<div class="play-top"><button class="icon-btn" data-act="texts" aria-label="Zurück">←</button><div class="bar"><div style="width:0%"></div></div><div class="count">' + t.gaps.length + ' Lücken</div></div>';
-    show('<section class="play">' + top +
-      '<article class="bubble-card q-card" id="qcard"><div class="q-kind">' + esc(t.topic) + ' · Language in Use</div>' +
+    const top = mode !== 'solo' ? topBar() + '<div class="meta-row"><span class="chip">' + esc(modeLabel()) + '</span><span class="chip">' + (t.hard ? 'Super Hard ' : '') + 'Text</span></div>'
+      : '<div class="play-top"><button class="icon-btn" data-act="' + (t.hard ? 'hard-texts' : 'texts') + '" aria-label="Zurück">←</button><div class="bar"><div style="width:0%"></div></div><div class="count">' + t.gaps.length + ' Lücken</div></div>';
+    show('<section class="play' + (t.hard ? ' hard' : '') + '">' + top +
+      '<article class="bubble-card q-card" id="qcard"><div class="q-kind">' + esc(t.topic) + ' · ' + (t.hard ? 'Super Hard Text' : 'Language in Use') + '</div>' +
       '<h2>' + esc(t.title) + '</h2>' +
       '<p class="q-instr">' + esc(t.instr || 'Tippe in jede Lücke die richtige Form des Wortes in Klammern bzw. das fehlende Wort (Präposition, Linking word …).') + '</p>' +
       '<div class="text-body"><p>' + body + '</p></div></article>' +
@@ -965,7 +973,7 @@
       (inExam ? 'exam-text' : 'check-text') + '">' + (inExam ? 'Abgeben' : 'Prüfen') + '</button></div></section>');
     onEnter = e => {
       const inputs = Array.from(app.querySelectorAll('.gap-input'));
-      if (S.checked) { textNext(t); return; }
+      if (S.checked) { if (mode === 'round') next(); else textNext(t); return; }
       const idx = inputs.indexOf(e.target);
       const nextEmpty = inputs.find((el, k) => k > idx && !el.value.trim());
       if (nextEmpty) { nextEmpty.focus(); return; }
@@ -1023,33 +1031,55 @@
       }
     });
     const pts = ok * 5;
-    addXp('texts', pts);
+    addXp(t.hard ? 'hard' : 'texts', pts);
     P.textsDone[t.id] = Math.max(P.textsDone[t.id] || 0, ok);
     if (ok === t.gaps.length) award('text-pro');
     checkXpBadges();
     save();
     const card = document.getElementById('qcard');
     card.classList.add(ok === t.gaps.length ? 'is-ok' : 'is-bad');
-    const bar = app.querySelector('.play-top .bar > div');
-    if (bar) bar.style.width = Math.round(ok / t.gaps.length * 100) + '%';
-    app.querySelector('.play-top .count').textContent = ok + '/' + t.gaps.length;
+    const inRound = S.mode === 'round';
+    if (inRound) {
+      // the whole text counts as one task: passed with at least 80 % of the gaps
+      const passed = ok >= Math.ceil(t.gaps.length * 0.8);
+      S.results.push({ q: { id: t.id, world: 'hard', type: 'text', prompt: t.title, why: '', answer: [] }, r: { correct: passed }, textRes: res, repeat: false });
+      S.xp += pts;
+      if (passed) { S.streak++; S.maxStreak = Math.max(S.maxStreak, S.streak); if (S.streak > P.bestStreak) P.bestStreak = S.streak; }
+      else { S.streak = 0; if (S.hearts > 0) S.hearts--; }
+      save();
+      const heartsEl = app.querySelector('.hearts');
+      if (heartsEl) heartsEl.outerHTML = heartsHTML();
+    } else {
+      const bar = app.querySelector('.play-top .bar > div');
+      if (bar) bar.style.width = Math.round(ok / t.gaps.length * 100) + '%';
+      app.querySelector('.play-top .count').textContent = ok + '/' + t.gaps.length;
+    }
     document.getElementById('feedback').innerHTML =
       '<div class="bubble ' + (ok === t.gaps.length ? 'ok' : (ok >= t.gaps.length / 2 ? 'near' : 'bad')) + '"><div class="fb-head"><span class="fb-icon">' +
       (ok === t.gaps.length ? '✓' : '!') + '</span>' + ok + ' von ' + t.gaps.length + ' Lücken richtig · +' + pts + ' XP</div>' +
       textFeedbackHTML(res) + '</div>';
-    const idx = TEXTS.indexOf(t);
-    const nxt = TEXTS[(idx + 1) % TEXTS.length];
+    if (inRound) {
+      const over = S.hearts <= 0;
+      document.getElementById('actions').innerHTML = '<span class="spacer"></span><button class="pill primary" data-act="next" data-enter>' +
+        (over ? 'Ergebnis ansehen' : 'Weiter →') + '</button>';
+      onEnter = () => next();
+      return;
+    }
+    const list = t.hard ? HARD_TEXTS : TEXTS;
+    const idx = list.indexOf(t);
+    const nxt = list[(idx + 1) % list.length];
     document.getElementById('actions').innerHTML =
       '<button class="pill ghost" data-act="text" data-id="' + esc(t.id) + '">Nochmal</button>' +
-      '<button class="pill ghost" data-act="texts">Alle Texte</button><span class="spacer"></span>' +
+      '<button class="pill ghost" data-act="' + (t.hard ? 'hard-texts' : 'texts') + '">Alle Texte</button><span class="spacer"></span>' +
       '<button class="pill primary" data-act="text" data-id="' + esc(nxt.id) + '" data-enter>Nächster Text →</button>';
     onEnter = () => startText(nxt.id);
     const first = inputs[0];
     if (first) { try { first.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
   }
   function textNext(t) {
-    const idx = TEXTS.indexOf(t);
-    startText(TEXTS[(idx + 1) % TEXTS.length].id);
+    const list = t.hard ? HARD_TEXTS : TEXTS;
+    const idx = list.indexOf(t);
+    startText(list[(idx + 1) % list.length].id);
   }
 
   function submitExamText(t) {
@@ -1116,11 +1146,15 @@
 
     if (wrongs.length) {
       html += '<div class="section-title"><h2>Deine Fehler</h2><span class="muted small">mit Erklärung</span></div>';
-      wrongs.forEach(x => { html += reviewItem(x.q, x.r); });
+      wrongs.forEach(x => {
+        html += x.textRes
+          ? '<div class="bubble-card review-item"><div class="q-kind">Super Hard Text · ' + esc(x.q.prompt) + ' · ' + x.textRes.filter(y => y.r.correct).length + '/' + x.textRes.length + '</div>' + textFeedbackHTML(x.textRes) + '</div>'
+          : reviewItem(x.q, x.r);
+      });
     } else if (first.length) {
       html += '<p class="muted" style="text-align:center;margin-top:20px">Keine Fehler – stark!</p>';
     }
-    lastSession = { mode: s.mode, world: s.world, round: s.round, wrongIds: wrongs.map(x => x.q.id) };
+    lastSession = { mode: s.mode, world: s.world, round: s.round, wrongIds: [].concat.apply([], wrongs.map(x => (x.textRes ? x.textRes.filter(y => !y.r.correct).map(y => y.q.id) : [x.q.id]))) };
     S = null;
     show(html);
     onEnter = () => {
@@ -1404,7 +1438,8 @@
       case 'quit': quit(); break;
       case 'texts': renderTextsList(); break;
       case 'text': startText(el.dataset.id); break;
-      case 'check-text': if (S) checkText(S.queue[0].text); break;
+      case 'check-text': if (S) checkText(current().text); break;
+      case 'hard-texts': renderTextsList(true); break;
       case 'exam-text': if (S) submitExamText(current().text); break;
       case 'writing': renderWritingList(); break;
       case 'write': renderWriting(el.dataset.id); break;
