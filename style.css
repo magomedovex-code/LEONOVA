@@ -18,6 +18,10 @@
   --warn-bg: #fff4e0;
   --mark-bad: #ffd4d4;
   --mark-good: #c9f0d8;
+  --hard: #c8102e;
+  --hard-deep: #8f0b20;
+  --hard-ink: #ffffff;
+  --hard-soft: #fde8eb;
   --radius: 26px;
   --radius-sm: 16px;
   --shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 10px 30px rgba(0, 0, 0, .06);
@@ -43,6 +47,10 @@
     --warn-bg: #2f230f;
     --mark-bad: #6b2427;
     --mark-good: #1d5636;
+    --hard: #e5243f;
+    --hard-deep: #a3142b;
+    --hard-ink: #ffffff;
+    --hard-soft: #3a1016;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35);
     color-scheme: dark;
   }
@@ -65,6 +73,10 @@
   --warn-bg: #2f230f;
   --mark-bad: #6b2427;
   --mark-good: #1d5636;
+  --hard: #e5243f;
+  --hard-deep: #a3142b;
+  --hard-ink: #ffffff;
+  --hard-soft: #3a1016;
   --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 30px rgba(0, 0, 0, .35);
   color-scheme: dark;
 }
@@ -459,3 +471,26 @@ details.model[open] summary { background: var(--ink); color: var(--ink-text); }
   .verb-fields { grid-template-columns: 1fr; }
   .grade { font-size: 52px; }
 }
+
+/* ---------- Super Hard (red) ---------- */
+.hard-card {
+  margin-top: 20px; border-radius: var(--radius); padding: 22px;
+  background: linear-gradient(135deg, var(--hard) 0%, var(--hard-deep) 100%);
+  color: var(--hard-ink); display: grid; gap: 14px; box-shadow: var(--shadow);
+}
+.hard-head { display: flex; gap: 14px; align-items: flex-start; }
+.hard-head h2 { font-size: 24px; margin: 0 0 4px; letter-spacing: .02em; text-transform: uppercase; }
+.hard-head p { margin: 0; opacity: .9; max-width: 60ch; }
+.hard-badge {
+  width: 48px; height: 48px; flex: none; border-radius: 16px; display: grid; place-items: center;
+  border: 2px solid var(--hard-ink); font-weight: 900; font-size: 18px;
+}
+.hard-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+.hard-meta span { border: 1px solid color-mix(in srgb, var(--hard-ink) 45%, transparent); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 700; }
+.pill.hard-pill { background: var(--hard-ink); color: var(--hard); border-color: var(--hard-ink); }
+.pill.hard-ghost { background: transparent; color: var(--hard-ink); border-color: var(--hard-ink); }
+.play.hard .q-card { border: 2px solid var(--hard); background: linear-gradient(var(--hard-soft), var(--surface) 70%); }
+.play.hard .q-kind { color: var(--hard); }
+.play.hard .bar > div { background: var(--hard); }
+.play.hard .pill.primary { background: var(--hard); border-color: var(--hard); color: var(--hard-ink); }
+.play.hard .answer-input:focus { border-color: var(--hard); }

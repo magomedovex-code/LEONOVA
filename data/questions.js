@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var Q = window.QUESTIONS = [];
-  var PREFIX = { 'adj-adv': 'adv', past: 'past', linking: 'lnk', vocab: 'voc' };
+  var PREFIX = { 'adj-adv': 'adv', past: 'past', linking: 'lnk', vocab: 'voc', hard: 'hard' };
   var count = {};
   function pad(n) { return n < 10 ? '00' + n : n < 100 ? '0' + n : String(n); }
   function add(world, rule, list) {
@@ -1113,6 +1113,167 @@
     { p: 'Children in Austria start ____ education at the age of six.', i: GAP, a: ['primary'], y: "primary education = Volksschule.", x: { secondary: "Secondary starts at about ten." } },
     { p: 'After primary school, pupils go on to ____ education.', i: GAP, a: ['secondary'], y: "secondary education.", x: {} }
   ]);
+
+  /* =========================== SUPER HARD: everything mixed =========================== */
+  var H2 = 'Finde ALLE Fehler (meist 2) und schreib den ganzen Satz richtig.';
+  var HR = 'Schreib den Satz um. Schreib den ganzen Satz.';
+  var HO = 'Bring die Wörter in die richtige Reihenfolge.';
+
+  add('hard', 'past-perfect', [
+    { t: 'sentence', i: H2, p: 'When I arrived, she already left and I feeled terrible.', a: ['When I arrived, she had already left and I felt terrible.'], y: "Earlier action → had already left. feel – felt – felt (irregular)." },
+    { t: 'sentence', i: H2, r: 'contrast', p: 'Despite of it rained, we played very good.', a: ['Despite the rain, we played very well.', 'In spite of the rain, we played very well.', 'Although it rained, we played very well.', 'Despite the fact that it rained, we played very well.', 'Although it was raining, we played very well.', 'Even though it rained, we played very well.'], y: "No 'despite of'; despite + noun / although + clause. How did we play? → well." },
+    { t: 'sentence', i: H2, r: 'comparison', p: 'My sister is more older then me and she drives very careful.', a: ['My sister is older than me and she drives very carefully.', 'My sister is older than I am and she drives very carefully.'], y: "older (not more older), than (not then), drives carefully (adverb)." },
+    { t: 'sentence', i: H2, r: 'for-since', p: 'I have known him since five years and we get on good.', a: ['I have known him for five years and we get on well.'], y: "for + period; get on WELL (adverb)." },
+    { t: 'sentence', i: H2, r: 'when-while', p: 'While I walked home, I was bumping into my old teacher.', a: ['While I was walking home, I bumped into my old teacher.'], y: "while + past continuous (long action); the short action → past simple." },
+    { t: 'sentence', i: H2, r: 'linking-verbs', p: 'The soup tasted deliciously, so we eat it all.', a: ['The soup tasted delicious, so we ate it all.'], y: "taste (linking verb) + adjective; past story → ate." },
+    { t: 'sentence', i: H2, r: 'used-to', p: "She didn't used to like vegetables, but now she eats them happy.", a: ["She didn't use to like vegetables, but now she eats them happily."], y: "didn't USE to; how does she eat? → happily." },
+    { t: 'sentence', i: H2, r: 'pairs', p: "Neither my brother nor my sister didn't make their homework.", a: ['Neither my brother nor my sister did their homework.', 'Neither my brother nor my sister did his or her homework.'], y: "neither … nor is already negative; DO homework." },
+    { t: 'sentence', i: H2, r: 'verb-prep', p: 'We discussed about the problem during we were having lunch.', a: ['We discussed the problem while we were having lunch.'], y: "discuss + object (no 'about'); while + clause, during + noun." },
+    { t: 'sentence', i: H2, r: 'tricky-adverbs', p: 'He was hardly working all day, so he was exhausting.', a: ['He was working hard all day, so he was exhausted.', 'He had been working hard all day, so he was exhausted.', 'He worked hard all day, so he was exhausted.'], y: "work hard (hardly = kaum); a person feels exhausted (-ed)." },
+    { t: 'sentence', i: H2, r: 'adj-prep', p: 'I am interested on music since I was a child.', a: ['I have been interested in music since I was a child.'], y: "since + starting point → present perfect: have been; interested IN." },
+    { t: 'sentence', i: H2, p: 'By the time the police came, the thief ran away already.', a: ['By the time the police came, the thief had already run away.', 'By the time the police came, the thief had run away already.'], y: "'By the time' → past perfect: had already run (run – ran – run)." },
+    { t: 'sentence', i: H2, r: 'adverb-position', p: 'She speaks very well English and she is good in maths.', a: ['She speaks English very well and she is good at maths.'], y: "verb + object + adverb; good AT." },
+    { t: 'sentence', i: H2, r: 'condition', p: "Unless you don't apologise, she will be very angry on you.", a: ['Unless you apologise, she will be very angry with you.', "If you don't apologise, she will be very angry with you.", 'Unless you apologize, she will be very angry with you.'], y: "unless + positive verb; angry WITH somebody." },
+    { t: 'sentence', i: H2, r: 'collocations-make-do', p: 'Yesterday I did a terrible mistake and my mum got very angrily.', a: ['Yesterday I made a terrible mistake and my mum got very angry.'], y: "MAKE a mistake; get + adjective (angry)." },
+    { t: 'sentence', i: H2, r: 'phrasal-verbs', p: 'We falled out last year but we maked up at Christmas.', a: ['We fell out last year but we made up at Christmas.'], y: "fall – fell, make – made (irregular)." }
+  ]);
+
+  add('hard', 'contrast', [
+    { t: 'sentence', i: "Verbinde mit 'despite' + -ing.", p: 'She had a bad cold. She ran faster than everyone.', a: ['Despite having a bad cold, she ran faster than everyone.', 'She ran faster than everyone despite having a bad cold.', 'In spite of having a bad cold, she ran faster than everyone.', 'She ran faster than everyone in spite of having a bad cold.'], y: "despite + having (-ing)." },
+    { t: 'sentence', i: "Schreib den Satz mit 'although'.", p: 'Despite being exhausted, they kept on dancing.', a: ['Although they were exhausted, they kept on dancing.', 'They kept on dancing although they were exhausted.', 'Even though they were exhausted, they kept on dancing.', 'Though they were exhausted, they kept on dancing.'], y: "although + subject + verb (they were)." },
+    { r: 'contrast', p: 'The trip was really expensive. ____, it was worth every cent.', a: ['however', 'nevertheless', 'still'], y: "New sentence + contrast → However,", x: { although: "'Although' needs a clause after it. → However,", despite: "'despite' + noun. → However," } },
+    { r: 'contrast', p: '____ (Despite / Although) feeling homesick, she enjoyed the workshop.', a: ['despite', 'in spite of'], y: "despite + -ing (feeling).", x: { although: "'although' + subject + verb. Here: -ing → despite." } }
+  ]);
+
+  add('hard', 'used-to', [
+    { t: 'sentence', i: "Schreib den Satz mit 'used to' (verneint).", p: 'When I was younger, I never ate fish.', a: ["When I was younger, I didn't use to eat fish.", "I didn't use to eat fish when I was younger."], y: "didn't use to + V1." },
+    { p: 'I (would / used to) have a cat called Tiger.', a: ['used to'], y: "'have' (a pet) is a state → only used to.", x: { would: "'would' is only for repeated actions, not states → used to." } }
+  ]);
+
+  add('hard', 'past-perfect', [
+    { t: 'sentence', i: "Schreib einen Satz: 'When we arrived, …' (past perfect + already).", p: 'First the film started. Then we arrived.', a: ['When we arrived, the film had already started.', 'When we arrived the film had already started.'], y: "Earlier action → had already started." },
+    { t: 'sentence', i: HO, p: 'had / already / when / the bus / we / left / got / to the stop', a: ['The bus had already left when we got to the stop.', 'When we got to the stop, the bus had already left.'], y: "had + already + V3; when + past simple." },
+    { p: 'Lisa was exhausted because she ____ (revise) for her exams all night.', r: 'past-perfect-cont', a: ['had been revising'], y: "Activity going on (all night) before a past moment → had been + V-ing.", x: { revised: "Duration before a past moment → had been revising.", 'was revising': "It happened BEFORE she was exhausted → had been revising." } },
+    { p: 'I suddenly realised that I ____ (leave) my phone on the bus.', a: ['had left'], y: "Earlier than 'realised' → had left.", x: { left: "Leaving the phone happened earlier → had left.", 'had leaved': "leave – left – left." } },
+    { p: 'My grandparents ____ (be) married for fifty years when my grandpa died.', a: ['had been'], y: "for fifty years up to a past moment → had been married.", x: { were: "Duration up to a past moment → had been." } },
+    { p: 'How long had you ____ (know) her before you became friends?', a: ['known'], y: "'know' is a stative verb → had known (no continuous!).", x: { 'been knowing': "'know' is never used in the continuous → had known.", knew: "had + V3: known." } },
+    { t: 'sentence', i: 'Bilde die Frage (past perfect continuous).', r: 'past-questions', p: 'How long / you / wait / before the doctor saw you?', a: ['How long had you been waiting before the doctor saw you?'], y: "How long + had + S + been + V-ing?" }
+  ]);
+
+  add('hard', 'purpose', [
+    { t: 'sentence', i: "Schreib den Satz mit 'so that'.", p: "He whispered because he didn't want to wake the baby.", a: ["He whispered so that he wouldn't wake the baby.", 'He whispered so that he would not wake the baby.', "He whispered so that he didn't wake the baby.", "He whispered so he wouldn't wake the baby."], y: "so that + would(n't) + V1." },
+    { p: 'She saved money ____ order to buy a new guitar.', a: ['in'], y: "IN order to + V1.", x: { for: "Fixed: IN order to." } }
+  ]);
+
+  add('hard', 'pairs', [
+    { t: 'sentence', i: "Verbinde mit 'neither … nor'.", p: "Tom didn't come. Anna didn't come either.", a: ['Neither Tom nor Anna came.'], y: "Neither A nor B + positive verb." },
+    { p: 'Both my mum ____ my stepdad work in Vienna.', a: ['and'], y: "both … AND.", x: { or: "both goes with AND." } }
+  ]);
+
+  add('hard', 'intensifiers', [
+    { t: 'sentence', i: "Schreib den Satz mit 'too … to'.", p: "He is very young. He can't drive.", a: ['He is too young to drive.', "He's too young to drive."], y: "too + adjective + to + V1." },
+    { t: 'sentence', i: "Schreib den Satz mit 'enough' (verneint, old).", p: "He is very young. He can't drive.", a: ["He isn't old enough to drive.", "He's not old enough to drive."], y: "not + adjective + enough + to V1." },
+    { p: "It's ____ (absolute) impossible to finish this today.", a: ['absolutely'], y: "'impossible' is extreme → absolutely (adverb).", x: { very: "Extreme adjective → absolutely.", absolute: "Before an adjective → adverb." } }
+  ]);
+
+  add('hard', 'cause-result', [
+    { t: 'sentence', i: "Schreib den Satz mit 'because of'.", p: 'We stayed inside because it was raining heavily.', a: ['We stayed inside because of the heavy rain.', 'Because of the heavy rain, we stayed inside.'], y: "because of + noun: heavily → the heavy rain." }
+  ]);
+
+  add('hard', 'condition', [
+    { t: 'sentence', i: "Schreib den Satz mit 'unless'.", p: "If they don't get on well, the trip will be a disaster.", a: ['Unless they get on well, the trip will be a disaster.', 'The trip will be a disaster unless they get on well.'], y: "unless = if … not (positive verb after unless)." },
+    { p: "I'll lend you my bike ____ you promise to be careful.", a: ['if', 'as long as', 'provided', 'providing', 'provided that'], y: "Condition: if / as long as.", x: { unless: "'unless' = if not. You lend it IF you promise." } }
+  ]);
+
+  add('hard', 'comparison', [
+    { t: 'sentence', i: "Schreib den Satz um: 'It is the …'", p: 'I have never read such a boring book.', a: ['It is the most boring book I have ever read.', "It's the most boring book I have ever read.", "It is the most boring book I've ever read.", "It's the most boring book I've ever read."], y: "the most + long adjective + I have ever + V3." },
+    { p: 'The older my brother gets, the ____ (lazy) he becomes.', a: ['lazier'], y: "the + comparative …, the + comparative: lazy → lazier.", x: { 'more lazy': "lazy → lazier (y → ier)." } },
+    { p: 'Her English is far ____ (good) than mine.', a: ['better'], y: "far + comparative: good → better.", x: { gooder: "Irregular: better.", 'more good': "Irregular: better." } },
+    { p: 'This is by far the ____ (bad) argument we have ever had.', a: ['worst'], y: "the + superlative: bad – worse – worst.", x: { worse: "'the … ever' → superlative: worst." } }
+  ]);
+
+  add('hard', 'adverb-position', [
+    { t: 'sentence', i: HO, p: 'hardly / ever / my friends and I / meet / up / these days', a: ['My friends and I hardly ever meet up these days.', 'These days my friends and I hardly ever meet up.'], y: "hardly ever goes before the main verb." },
+    { t: 'sentence', i: HO, p: 'fluently / last year / in Spain / she / Spanish / spoke', a: ['She spoke Spanish fluently in Spain last year.', 'Last year she spoke Spanish fluently in Spain.'], y: "verb + object + manner – place – time." },
+    { t: 'sentence', i: HO, p: 'never / had / she / before / such / a / chance meeting / experienced', a: ['She had never experienced such a chance meeting before.'], y: "had + never + V3." }
+  ]);
+
+  add('hard', 'adj-vs-adv', [
+    { p: 'He looked ____ (anxious) at the clock.', r: 'linking-verbs', a: ['anxiously'], y: "'look at' is an action → adverb.", x: { anxious: "'looked AT the clock' is an action → adverb: anxiously." } },
+    { p: 'That sounds ____ (incredible) interesting.', a: ['incredibly'], y: "Describes the adjective 'interesting' → adverb.", x: { incredible: "Before an adjective → adverb." } },
+    { p: 'The milk tasted ____ (strange), so I poured it away.', r: 'linking-verbs', a: ['strange'], y: "taste (linking verb) + adjective.", x: { strangely: "After 'taste' (linking verb) → adjective." } },
+    { p: 'The test was ____ (surprise) difficult.', a: ['surprisingly'], y: "surprise → surprising → surprisingly (adverb before an adjective).", x: { surprising: "Before an adjective → adverb.", surprised: "Before an adjective → adverb: surprisingly." } },
+    { p: 'She ran so ____ (fast) that nobody could catch her.', r: 'irregular-adverbs', a: ['fast'], y: "fast = adjective and adverb.", x: { fastly: "There is no 'fastly'." } },
+    { p: 'He spoke so quietly that I could ____ (hard) hear him.', r: 'tricky-adverbs', a: ['hardly'], y: "hardly = kaum.", x: { hard: "'kaum' → hardly." } },
+    { p: 'We had ____ (hard) any time to catch up.', r: 'tricky-adverbs', a: ['hardly'], y: "hardly any = kaum.", x: { hard: "'kaum' → hardly." } }
+  ]);
+
+  add('hard', 'word-formation', [
+    { p: '____ (fortune), nobody was hurt.', a: ['fortunately', 'luckily'], y: "fortune → fortunate → fortunately (sentence adverb).", x: { fortunate: "Sentence adverb → fortunately." } },
+    { p: 'She is the most ____ (responsibility) person in our family.', a: ['responsible'], y: "Before the noun 'person' → adjective.", x: { responsibility: "You need an adjective here." } },
+    { p: 'She is very ____ (interest) in composing her own songs.', a: ['interested'], y: "A person feels → interested (+ in).", x: { interesting: "-ing = what causes it. She FEELS → interested." } },
+    { p: "I've never felt so ____ (security) as in my parental home.", a: ['secure', 'safe'], y: "feel + adjective: security → secure.", x: { security: "After 'felt' → adjective: secure." } },
+    { p: 'The ____ (separate) of my parents was hard for me.', a: ['separation'], y: "After 'The' → noun: separation.", x: { separate: "You need a noun → separation." } },
+    { p: 'Their ____ (hate) for each other was obvious.', a: ['hatred', 'hate'], y: "Noun: hatred.", x: { hated: "You need a noun → hatred." } },
+    { p: "It's important to treat everybody with ____ (respectful).", a: ['respect'], y: "with + noun: respect.", x: { respectful: "After 'with' → noun: respect." } }
+  ]);
+
+  add('hard', 'phrasal-verbs', [
+    { p: 'We met at a party and hit it ____ immediately.', r: 'vocab-friendship', a: ['off'], y: "hit it OFF.", x: {} },
+    { p: "My stepsister and I didn't get ____ at first, but now we're close.", r: 'vocab-friendship', a: ['along', 'on'], y: "get along / get on (with sb).", x: {} },
+    { p: 'While I was shopping, I ____ (bump into) my old classmate.', a: ['bumped into', 'ran into'], y: "Short action → past simple: bumped into.", x: { 'was bumping into': "The short action → past simple." } },
+    { p: 'They ____ (fall out) years ago and still haven\'t made up.', a: ['fell out'], y: "years ago → past simple: fell out.", x: { 'felt out': "fall → fell.", 'falled out': "fall → fell." } },
+    { p: 'Good friends never ____ each other down.', r: 'vocab-feelings', a: ['let'], y: "let each other down.", x: {} }
+  ]);
+
+  add('hard', 'vocab-friendship', [
+    { p: 'Peer group ____ can make teenagers do stupid things.', a: ['pressure'], y: "peer group pressure = Gruppenzwang.", x: {} },
+    { p: 'Education is ____ until the age of fifteen in Austria.', r: 'vocab-school', a: ['compulsory', 'obligatory', 'mandatory'], y: "compulsory = verpflichtend.", x: {} },
+    { p: 'There is a big age ____ between me and my half-sister.', r: 'vocab-family', a: ['gap', 'difference'], y: "age gap.", x: {} },
+    { p: "I can't stand people who ____ others by their looks.", r: 'vocab-feelings', a: ['judge'], y: "judge = beurteilen.", x: {} }
+  ]);
+
+  add('hard', 'past-continuous', [
+    { p: 'At 9 pm last night I ____ (still / do) the washing-up.', a: ['was still doing'], y: "A moment in progress → was + still + V-ing.", x: { 'still did': "At 9 pm = in progress → was still doing." } },
+    { p: 'When the teacher came in, the students ____ (argue) loudly.', a: ['were arguing'], y: "Background action in progress → were arguing.", x: { argued: "They were in the middle of it → were arguing." } }
+  ]);
+
+  add('hard', 'past-simple', [
+    { p: 'Neither of us ____ (know) what had happened.', a: ['knew'], y: "Past simple: know – knew – known.", x: { known: "known = V3. Past simple → knew.", knowed: "know is irregular: knew." } },
+    { p: 'It ____ (take) me ages to get to know my new classmates.', r: 'collocations-other', a: ['took'], y: "It took me + time.", x: { taked: "take – took – taken." } },
+    { p: 'He ____ (make or do) a real effort to get along with his stepbrother.', r: 'collocations-make-do', a: ['made'], y: "MAKE an effort → made.", x: { did: "Collocation: MAKE an effort." } },
+    { p: '____ broke the window? – Tom did.', r: 'past-questions', a: ['who'], y: "Subject question: Who broke …? (no did)", x: {} }
+  ]);
+
+  add('hard', 'verb-prep', [
+    { p: "I'm looking forward to ____ (hear) from you.", a: ['hearing'], y: "look forward TO + -ing.", x: { hear: "'to' is a preposition here → -ing: hearing." } },
+    { p: 'She apologised for ____ (be) late.', a: ['being'], y: "preposition + -ing.", x: { be: "After 'for' → -ing: being." } },
+    { p: 'We arrived ____ London late at night.', r: 'prep-place', a: ['in'], y: "arrive IN a city/country, AT a building.", x: { at: "arrive AT a building, IN a city.", to: "Never 'arrive to'." } },
+    { p: 'Please send it ____ Friday at the latest.', r: 'by-until', a: ['by'], y: "by = deadline.", x: { until: "Deadline → by." } }
+  ]);
+
+  // hard irregular verbs
+  [
+    ['lay', ['laid'], ['laid'], 'legen'],
+    ['lie', ['lay'], ['lain'], 'liegen'],
+    ['forbid', ['forbade', 'forbad'], ['forbidden'], 'verbieten'],
+    ['seek', ['sought'], ['sought'], 'suchen'],
+    ['swear', ['swore'], ['sworn'], 'schwören'],
+    ['flee', ['fled'], ['fled'], 'fliehen'],
+    ['strike', ['struck'], ['struck'], 'schlagen, streiken'],
+    ['creep', ['crept'], ['crept'], 'kriechen, schleichen'],
+    ['bend', ['bent'], ['bent'], 'biegen'],
+    ['slide', ['slid'], ['slid'], 'rutschen'],
+    ['spit', ['spat', 'spit'], ['spat', 'spit'], 'spucken'],
+    ['weep', ['wept'], ['wept'], 'weinen'],
+    ['bet', ['bet'], ['bet'], 'wetten'],
+    ['wind', ['wound'], ['wound'], 'wickeln, aufziehen']
+  ].forEach(function (v) {
+    add('hard', 'irregular-verbs', [{
+      t: 'verb3', p: v[0], a: [v[1], v[2]], de: v[3],
+      y: v[0] + ' – ' + v[1].join('/') + ' – ' + v[2].join('/') + '. A tricky irregular verb!'
+    }]);
+  });
 
   /* Make/do prompts and other checks happen in app.js. */
 })();

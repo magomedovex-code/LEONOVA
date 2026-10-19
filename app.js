@@ -19,6 +19,8 @@
   const WORLD = {};
   WORLDS.forEach(w => { WORLD[w.id] = w; });
   WORLD.texts = { id: 'texts', name: 'Language in Use', icon: '¶' };
+  const HARD = { id: 'hard', name: 'Super Hard', icon: '!!', desc: 'Alles gemischt: Past Tenses, Adjektiv/Adverb, Linking Words und Vokabeln in den schwersten Aufgaben. Keine Hinweise!' };
+  WORLD.hard = HARD;
 
   const ROUND_SIZE = 10;
   const EXAM_COUNT = 5;
@@ -91,7 +93,7 @@
 
   // Fixed rounds per world: one fixed mixed order, cut into rounds of 10 (a short rest joins the last round)
   const ROUNDS = {};
-  WORLDS.forEach(w => {
+  WORLDS.concat([HARD]).forEach(w => {
     const list = shuffle(QUESTIONS.filter(q => q.world === w.id), 'leonova-round-' + w.id);
     const rounds = [];
     for (let i = 0; i < list.length; i += ROUND_SIZE) rounds.push(list.slice(i, i + ROUND_SIZE));
@@ -462,6 +464,7 @@
     { id: 'master-past', icon: '⟲', name: 'Past Tense Master', desc: 'Alle Runden in Past Tenses geschafft' },
     { id: 'master-linking', icon: '∞', name: 'Linking Legend', desc: 'Alle Runden in Linking Words geschafft' },
     { id: 'master-vocab', icon: 'Wd', name: 'Word Collector', desc: 'Alle Runden in Vocabulary geschafft' },
+    { id: 'master-hard', icon: '!!', name: 'Super Hard Survivor', desc: 'Alle Super-Hard-Runden geschafft' },
     { id: 'text-pro', icon: '¶', name: 'Text Pro', desc: 'Einen Lückentext ohne Fehler' },
     { id: 'writer', icon: '✎', name: 'Writer', desc: 'Alle Punkte einer Schreib-Checkliste erfüllt' },
     { id: 'speed', icon: '⏱', name: 'Speedster', desc: '10 richtige im 60-Sekunden-Modus' },
@@ -479,6 +482,7 @@
   }
   function checkXpBadges() {
     WORLDS.forEach(w => { if (roundsDone(w.id) === ROUNDS[w.id].length) award('master-' + w.id); });
+    if (ROUNDS.hard.length && roundsDone('hard') === ROUNDS.hard.length) award('master-hard');
     if (totalXp() >= 1000) award('xp1000');
     if (P.fixed >= 10) award('fixer');
   }
@@ -528,6 +532,12 @@
       '<div class="hero-stats"><span>' + xp + ' XP</span><span>Beste Serie: ' + (P.bestStreak || 0) + '</span><span>' +
       Object.keys(P.badges).length + '/' + BADGES.length + ' Abzeichen</span></div></section>';
 
+    const hTotal = ROUNDS.hard.length, hDone = roundsDone('hard'), hNext = nextRound('hard');
+    html += '<section class="hard-card">' +
+      '<div class="hard-head"><span class="hard-badge">!!</span><div><h2>Super Hard</h2><p>' + esc(HARD.desc) + '</p></div></div>' +
+      '<div class="hard-meta"><span>' + QUESTIONS.filter(q => q.world === 'hard').length + ' Aufgaben</span><span>' + hDone + ' von ' + hTotal + ' Runden geschafft</span></div>' +
+      '<div class="card-actions"><button class="pill hard-pill" data-act="round" data-world="hard" data-round="' + hNext + '">Runde ' + (hNext + 1) + ' starten</button>' +
+      '<button class="pill hard-ghost" data-act="rounds" data-world="hard">Alle Runden</button></div></section>';
     html += '<div class="section-title"><h2>Welten</h2><span class="muted small">Gleiche Runden für alle</span></div><div class="grid">';
     WORLDS.forEach(w => {
       const n = QUESTIONS.filter(q => q.world === w.id).length;
@@ -692,7 +702,7 @@
       : promptHTML(q.prompt);
 
     show(
-      '<section class="play">' + topBar() +
+      '<section class="play' + (q.world === 'hard' ? ' hard' : '') + '">' + topBar() +
       '<div class="meta-row"><span class="chip">' + esc(modeLabel()) + '</span><span class="chip">' + esc(w.name) + '</span>' +
       (entry.repeat ? '<span class="chip">Wiederholung</span>' : '') +
       (S.mode !== 'exam' ? '<span class="chip" id="streakChip">Serie ' + S.streak + '</span>' : '') +
@@ -706,7 +716,7 @@
       '</article>' +
       '<div id="feedback"></div>' +
       '<div class="actions" id="actions">' +
-      (exam || S.mode === 'time' ? '' : '<button class="pill ghost" data-act="hint" id="hintBtn">Hinweis (½ Punkte)</button>') +
+      (exam || S.mode === 'time' || q.world === 'hard' ? '' : '<button class="pill ghost" data-act="hint" id="hintBtn">Hinweis (½ Punkte)</button>') +
       (exam ? '' : '<button class="pill ghost" data-act="rule" data-rule="' + esc(q.rule) + '">Regel ansehen</button>') +
       '<span class="spacer"></span>' +
       '<button class="pill primary" data-act="check" id="mainBtn">' + (exam ? (S.idx === S.queue.length - 1 ? 'Abgeben' : 'Weiter →') : 'Prüfen') + '</button>' +
